@@ -1,6 +1,7 @@
 package model
 
 import (
+    "time"
     "log"
     "database/sql"
     _ "github.com/go-sql-driver/mysql"
@@ -9,8 +10,8 @@ import (
 
 type UserProfile struct {
     Id          int         `json:"id"`
-    Name        string      `json:"name"`
-    Company     string      `json:"compnay"`
+    Name        string      `json:"name" binding:"required"`
+    Company     string      `json:"company" binding:"required"`
     Position    string      `json:"position"`
     Avatar      string      `json:"avatar"`
 }
@@ -43,4 +44,21 @@ func GetList(offset, num int) []UserProfile {
         users = append(users, user)
     }
     return users
+}
+
+// 插入一条个人信息
+func Insert(user UserProfile) int {
+    // 建立数据库连接
+    db, err := sql.Open("mysql", config.Source)
+    if err != nil {
+        log.Fatal(err.Error())
+    }
+    defer db.Close()
+
+    // 执行
+    statement := "insert into " + tblName + " (name, company, create_time, update_time) values (?, ?, ?, ?)"
+    result, _ := db.Exec(statement, user.Name, user.Company, time.Now().Unix(), time.Now().Unix())
+
+    id, _ := result.LastInsertId()
+    return int(id)
 }

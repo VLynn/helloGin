@@ -25,6 +25,20 @@ func setupRouter() *gin.Engine {
                 "count": len(users),
             })
         })
+
+        pg.POST("/insert", func(c *gin.Context) {
+            var user model.UserProfile
+            err := c.BindJSON(&user)
+            if err != nil {
+                log.Println(err)
+                return
+            }
+
+            insert_id := model.Insert(user)
+            c.JSON(http.StatusOK, gin.H{
+                "insert_id": insert_id,
+            })
+        })
     }
  
     router.Any("/", func(c *gin.Context) {
