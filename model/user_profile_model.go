@@ -62,3 +62,29 @@ func Insert(user UserProfile) int {
     id, _ := result.LastInsertId()
     return int(id)
 }
+
+func Update(id int, name string, company string) {
+    db, err := sql.Open("mysql", config.Source)
+    if err != nil {
+        log.Fatal(err.Error())
+    }
+    defer db.Close()
+
+    // 预编译并执行
+    statement := "update " + tblName + " set name = ?, company = ? where id = ?"
+    stmt, err := db.Prepare(statement)
+    defer stmt.Close()
+    stmt.Exec(name, company, id)
+}
+
+func Delete(id int) {
+    db, err := sql.Open("mysql", config.Source)
+    if err != nil {
+        log.Fatal(err.Error())
+    }
+    defer db.Close()
+
+    // 执行
+    statement := "delete from " + tblName + " where id = ?"
+    db.Exec(statement, id)
+}

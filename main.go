@@ -4,6 +4,7 @@ import (
     "strconv"
     "log"
     "time"
+    "encoding/json"
     "net/http"
     "github.com/gin-gonic/gin"
     "helloGin/model"
@@ -33,11 +34,42 @@ func setupRouter() *gin.Engine {
                 log.Println(err)
                 return
             }
+            log.Println(user.Name)
 
             insert_id := model.Insert(user)
             c.JSON(http.StatusOK, gin.H{
                 "insert_id": insert_id,
             })
+        })
+
+        pg.POST("/update", func(c *gin.Context) {
+            data, err := c.GetRawData()
+            if err != nil {
+                c.String(http.StatusNotAcceptable, "get post data failed, err = %s", err)
+                return
+            }
+
+            var user map[string]interface{}
+            json.Unmarshal(data, &user)
+            id := user["id"].(float64)
+            name := user["name"].(string)
+            company := user["company"].(string)
+
+            log.Println(company)
+            model.Update(int(id), name, company)
+            c.String(http.StatusOK, "success.")
+        })
+
+        pg.GET("/delete", func(c *gin.Context) {
+            id_str := c.Query("id")
+            if id_str == "" {
+                c.String(http.StatusNotAcceptable, "param id missing")
+                return
+            }
+
+            id, _ := strconv.Atoi(id_str)
+            model.Delete(id)
+            c.String(http.StatusOK, "deleted")
         })
     }
  
