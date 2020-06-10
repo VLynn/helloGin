@@ -7,6 +7,7 @@ import (
     "encoding/json"
     "net/http"
     "github.com/gin-gonic/gin"
+    "github.com/gomodule/redigo/redis"
     "helloGin/model"
 )
 
@@ -14,6 +15,7 @@ func setupRouter() *gin.Engine {
     router := gin.Default()
     router.Static("/front", "./front")
 
+    // 对接mysql的demo
     pg := router.Group("/user/profile")
     {
         pg.GET("/get_list", func(c *gin.Context) {
@@ -72,7 +74,39 @@ func setupRouter() *gin.Engine {
             c.String(http.StatusOK, "deleted")
         })
     }
- 
+
+    // 对接redis的demo
+    router.GET("/redis/get", func(c *gin.Context) {
+        key := c.DefaultQuery("k", "test")
+
+        // 连接redis
+        rc, err := redis.Dial("tcp", "192.168.28.20:6379")
+        if err != nil {
+            c.String(500, "connect to redis failed, err =", err)
+            return
+        }
+        defer rc.Close()
+
+        str, err := redis.String(rc.Do("get", key))
+        c.String(http.StatusOK, str)
+    })
+
+    router.GET("/redis/set", func(c *gin.Context) {
+        key := c.Query("k")
+        value := c.Query("v")
+
+        // 连接redis
+        rc, err := redis.Dial("tcp", "192.168.28.20:6379")
+        if err != nil {
+            c.String(500, "connect to redis failed, err =", err)
+            return
+        }
+        defer rc.Close()
+
+        rc.Do("set", key, value)
+        c.String(http.StatusOK, "success.")
+    })
+
     router.Any("/", func(c *gin.Context) {
         c.String(http.StatusOK, "hello world")
     })
