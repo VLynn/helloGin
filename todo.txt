@@ -1,4 +1,5 @@
 redis对接
 热更新
 mysql连接封装和复用
+redis连接封装和复用
 model层命名冲突和函数隔离
