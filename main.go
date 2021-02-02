@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/gomodule/redigo/redis"
+	"helloGin/lib"
 	"helloGin/model"
 	routers "helloGin/router"
 	"log"
@@ -172,6 +173,7 @@ func setupRouter() *gin.Engine {
 
 func main() {
 	// router := setupRouter()
+	lib.InitMysql()
 	router := routers.InitRouter()
 	router.Run()
 }
