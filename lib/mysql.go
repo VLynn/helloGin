@@ -58,3 +58,16 @@ func Modify(statement string, args ...interface{}) (affectedRows int64, err erro
 	}
 	return count, nil
 }
+
+/*
+ * 封装mysql读操作
+ * @param statement sql语句
+ * @param args ?占位符对应的变量
+ */
+func Query(statement string, args ...interface{}) (rows *sql.Rows, err error) {
+	rows, err = db.Query(statement, args)
+	if err != nil {
+		log.Println("query sql failed, err: ", err)
+	}
+	return
+}

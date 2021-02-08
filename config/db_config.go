@@ -10,3 +10,9 @@ const (
 )
 
 var Source = fmt.Sprintf("%s:%s@tcp(%s:%s)/db_user?charset=utf8", User, Password, IP, Port)
+
+// 表名
+const (
+	TblNameUserProfile = "t_user_profile"
+	TblNameUserAccount = "t_user_account"
+)
